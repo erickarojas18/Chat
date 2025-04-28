@@ -1,6 +1,6 @@
 // registerUser/index.mjs
 import mongoose from 'mongoose';
-import User from '../loginUser/models/User.mjs';
+import User from './models/User.mjs';
 import bcrypt from 'bcryptjs';
 import dotenv from 'dotenv';
 
