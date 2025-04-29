@@ -14,12 +14,24 @@ export const handler = async (event) => {
 
     const user = await User.findOne({ email });
     if (!user) {
-      return { statusCode: 400, body: JSON.stringify({ message: 'Invalid credentials' }) };
+      return {
+        statusCode: 400,
+        headers: {
+          'Access-Control-Allow-Origin': 'http://localhost:3001', 
+        },
+        body: JSON.stringify({ message: 'Invalid credentials' })
+      };
     }
 
     const isMatch = await bcrypt.compare(password, user.password);
     if (!isMatch) {
-      return { statusCode: 400, body: JSON.stringify({ message: 'Invalid credentials' }) };
+      return {
+        statusCode: 400,
+        headers: {
+          'Access-Control-Allow-Origin': 'http://localhost:3001', 
+        },
+        body: JSON.stringify({ message: 'Invalid credentials' })
+      };
     }
 
     const token = jwt.sign(
@@ -30,12 +42,22 @@ export const handler = async (event) => {
 
     return { 
       statusCode: 200, 
+      headers: {
+        'Access-Control-Allow-Origin': 'http://localhost:3001', 
+        'Access-Control-Allow-Credentials': true,
+      },
       body: JSON.stringify({ 
         message: 'Login exitoso',
         token 
       }) 
     };
   } catch (error) {
-    return { statusCode: 500, body: JSON.stringify({ error: error.message }) };
+    return {
+      statusCode: 500,
+      headers: {
+        'Access-Control-Allow-Origin': 'http://localhost:3001', 
+      },
+      body: JSON.stringify({ error: error.message })
+    };
   }
 };
