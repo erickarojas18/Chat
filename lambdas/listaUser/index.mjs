@@ -1,11 +1,10 @@
 import mongoose from 'mongoose';
-import User from './models/User.mjs'; // Asegúrate de importar correctamente el modelo
+import User from './models/User.mjs';
 import dotenv from 'dotenv';
-import jwt from 'jsonwebtoken'; // Asegúrate de tener jsonwebtoken instalado
+import jwt from 'jsonwebtoken';
 
 dotenv.config();
 
-// Variable para la conexión a MongoDB, para que sea persistente
 let isConnected = false;
 
 const connectToDatabase = async () => {
@@ -35,44 +34,79 @@ export const handler = async (event) => {
   console.log('Lambda started');
 
   try {
-    // Asegúrate de conectar a la base de datos
     await connectToDatabase();
 
-    // Verificar el token JWT
     const token = event.headers.Authorization && event.headers.Authorization.split(' ')[1];
 
     if (!token) {
-      return { statusCode: 401, body: JSON.stringify({ message: 'Authorization token is required' }) };
+      return {
+        statusCode: 401,
+        headers: {
+          'Access-Control-Allow-Origin': 'http://localhost:3001',
+          'Access-Control-Allow-Credentials': true,
+        },
+        body: JSON.stringify({ message: 'Authorization token is required' }),
+      };
     }
 
-    // Verificar el token JWT
     const decoded = await verifyToken(token);
     console.log('User authenticated:', decoded);
 
-    // Ruta GET /users para obtener los usuarios de una empresa
     if (event.httpMethod === 'GET') {
-      const companyId = event.queryStringParameters.companyId;  // Obtén companyId desde los parámetros de la consulta
+      const companyId = event.queryStringParameters.companyId;
 
       if (!companyId) {
-        return { statusCode: 400, body: JSON.stringify({ message: 'Company ID is required' }) };
+        return {
+          statusCode: 400,
+          headers: {
+            'Access-Control-Allow-Origin': 'http://localhost:3001',
+            'Access-Control-Allow-Credentials': true,
+          },
+          body: JSON.stringify({ message: 'Company ID is required' }),
+        };
       }
 
-      // Verificar que el usuario autenticado pertenezca a la misma empresa
       if (decoded.companyId !== companyId) {
-        return { statusCode: 403, body: JSON.stringify({ message: 'User is not authorized to access this company\'s data' }) };
+        return {
+          statusCode: 403,
+          headers: {
+            'Access-Control-Allow-Origin': 'http://localhost:3001',
+            'Access-Control-Allow-Credentials': true,
+          },
+          body: JSON.stringify({ message: 'User is not authorized to access this company\'s data' }),
+        };
       }
 
-      const users = await User.find({ companyId });  // Filtramos por companyId
+      const users = await User.find({ companyId });
 
       return {
         statusCode: 200,
+        headers: {
+          'Access-Control-Allow-Origin': 'http://localhost:3001',
+          'Access-Control-Allow-Credentials': true,
+        },
         body: JSON.stringify(users),
       };
     }
 
-    return { statusCode: 404, body: JSON.stringify({ message: 'Route not found' }) };
+    return {
+      statusCode: 404,
+      headers: {
+        'Access-Control-Allow-Origin': 'http://localhost:3001',
+        'Access-Control-Allow-Credentials': true,
+      },
+      body: JSON.stringify({ message: 'Route not found' }),
+    };
+
   } catch (error) {
     console.error('Error occurred:', error);
-    return { statusCode: 500, body: JSON.stringify({ error: error.message }) };
+    return {
+      statusCode: 500,
+      headers: {
+        'Access-Control-Allow-Origin': 'http://localhost:3001',
+        'Access-Control-Allow-Credentials': true,
+      },
+      body: JSON.stringify({ error: error.message }),
+    };
   }
 };

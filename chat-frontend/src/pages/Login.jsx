@@ -1,11 +1,14 @@
 import { useState } from 'react';
 import axios from 'axios';
+import { useNavigate } from 'react-router-dom'; // Importa useNavigate
 import '../Css/Login.css';
 
 const Login = () => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
+  
+  const navigate = useNavigate(); // Inicializa el hook de navegación
 
   const handleLogin = async (e) => {
     e.preventDefault();
@@ -20,7 +23,9 @@ const Login = () => {
       const { token } = response.data;
       localStorage.setItem('token', token);
       alert('Login exitoso');
-      // Aquí podrías redirigir, por ejemplo a /chat
+      
+      // Redirige al Dashboard después del login exitoso
+      navigate('/dashboard');
     } catch (err) {
       setError(err.response?.data?.message || 'Error de login');
     }

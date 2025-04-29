@@ -1,62 +1,105 @@
 import mongoose from 'mongoose';
-import User from './models/User.mjs';
-import bcrypt from 'bcryptjs';
-import jwt from 'jsonwebtoken';
+import User from './models/User.mjs'; // Asegúrate de importar correctamente el modelo
 import dotenv from 'dotenv';
+import jwt from 'jsonwebtoken'; // Asegúrate de tener jsonwebtoken instalado
 
 dotenv.config();
 
+// Variable para la conexión a MongoDB, para que sea persistente
+let isConnected = false;
+
+const connectToDatabase = async () => {
+  if (isConnected) {
+    console.log('Using existing MongoDB connection');
+    return;
+  }
+
+  console.log('Connecting to MongoDB...');
+  await mongoose.connect(process.env.MONGO_URI);
+  isConnected = true;
+  console.log('MongoDB connected!');
+};
+
+const verifyToken = (token) => {
+  return new Promise((resolve, reject) => {
+    jwt.verify(token, process.env.JWT_SECRET, (err, decoded) => {
+      if (err) {
+        return reject('Invalid or expired token');
+      }
+      resolve(decoded);
+    });
+  });
+};
+
 export const handler = async (event) => {
+  console.log('Lambda started');
+
+  const headers = {
+    'Access-Control-Allow-Origin': 'http://localhost:3001', // Ajusta según tu dominio
+    'Access-Control-Allow-Credentials': 'true', // Si necesitas permitir credenciales (cookies, autenticación)
+    'Content-Type': 'application/json', // Para especificar el tipo de contenido de la respuesta
+  };
+
   try {
-    await mongoose.connect(process.env.MONGO_URI);
+    // Asegúrate de conectar a la base de datos
+    await connectToDatabase();
 
-    const { email, password } = JSON.parse(event.body);
+    // Verificar el token JWT
+    const token = event.headers.Authorization && event.headers.Authorization.split(' ')[1];
 
-    const user = await User.findOne({ email });
-    if (!user) {
-      return {
-        statusCode: 400,
-        headers: {
-          'Access-Control-Allow-Origin': 'http://localhost:3001', 
-        },
-        body: JSON.stringify({ message: 'Invalid credentials' })
+    if (!token) {
+      return { 
+        statusCode: 401, 
+        headers,
+        body: JSON.stringify({ message: 'Authorization token is required' })
       };
     }
 
-    const isMatch = await bcrypt.compare(password, user.password);
-    if (!isMatch) {
+    // Verificar el token JWT
+    const decoded = await verifyToken(token);
+    console.log('User authenticated:', decoded);
+
+    // Ruta GET /users para obtener los usuarios de una empresa
+    if (event.httpMethod === 'GET') {
+      const companyId = event.queryStringParameters.companyId;  // Obtén companyId desde los parámetros de la consulta
+
+      if (!companyId) {
+        return { 
+          statusCode: 400, 
+          headers,
+          body: JSON.stringify({ message: 'Company ID is required' })
+        };
+      }
+
+      // Verificar que el usuario autenticado pertenezca a la misma empresa
+      if (decoded.companyId !== companyId) {
+        return { 
+          statusCode: 403, 
+          headers,
+          body: JSON.stringify({ message: 'User is not authorized to access this company\'s data' })
+        };
+      }
+
+      const users = await User.find({ companyId });  // Filtramos por companyId
+
       return {
-        statusCode: 400,
-        headers: {
-          'Access-Control-Allow-Origin': 'http://localhost:3001', 
-        },
-        body: JSON.stringify({ message: 'Invalid credentials' })
+        statusCode: 200,
+        headers,
+        body: JSON.stringify(users),
       };
     }
-
-    const token = jwt.sign(
-      { userId: user._id, companyId: user.companyId },
-      process.env.JWT_SECRET,
-      { expiresIn: '7d' }
-    );
 
     return { 
-      statusCode: 200, 
-      headers: {
-        'Access-Control-Allow-Origin': 'http://localhost:3001', 
-        'Access-Control-Allow-Credentials': true,
-      },
-      body: JSON.stringify({ 
-        message: 'Login exitoso',
-        token 
-      }) 
+      statusCode: 404, 
+      headers,
+      body: JSON.stringify({ message: 'Route not found' })
     };
+
   } catch (error) {
-    return {
-      statusCode: 500,
-      headers: {
-        'Access-Control-Allow-Origin': 'http://localhost:3001', 
-      },
+    console.error('Error occurred:', error);
+    return { 
+      statusCode: 500, 
+      headers,
       body: JSON.stringify({ error: error.message })
     };
   }
