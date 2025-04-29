@@ -7,14 +7,22 @@ const Historial = ({ userId, contactId }) => {
 
   useEffect(() => {
     const fetchHistory = async () => {
+      // Verificar que los parámetros estén definidos
+      if (!userId || !contactId) {
+        console.error('userId o contactId están vacíos');
+        return;
+      }
+
       try {
+        // Realizar la solicitud con parámetros correctos
+        console.log('Cargando historial con userId:', userId, 'y contactId:', contactId);
+
         const response = await axios.get(
-          `https://tu-api.execute-api.us-east-1.amazonaws.com/dev/history`,
+          'https://814ooupswb.execute-api.us-east-1.amazonaws.com/dev/history', 
           {
             params: {
               userId,
               contactId,
-              limit: 50
             }
           }
         );
@@ -38,7 +46,9 @@ const Historial = ({ userId, contactId }) => {
         {messages.map((msg, index) => (
           <div key={index} style={{ marginBottom: '10px' }}>
             <strong>{msg.from === userId ? 'Tú' : 'Ellx'}:</strong> {msg.content}
-            <div style={{ fontSize: '0.8em', color: '#666' }}>{new Date(msg.timestamp).toLocaleString()}</div>
+            <div style={{ fontSize: '0.8em', color: '#666' }}>
+              {new Date(msg.timestamp).toLocaleString()}
+            </div>
           </div>
         ))}
       </div>
@@ -46,4 +56,4 @@ const Historial = ({ userId, contactId }) => {
   );
 };
 
-export default Historial;  // Asegúrate de que el componente se llama Historial
+export default Historial;

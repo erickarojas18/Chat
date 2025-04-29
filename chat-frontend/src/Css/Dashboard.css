@@ -1,0 +1,40 @@
+.dashboard-container {
+    display: flex;
+    flex-direction: row-reverse; /* Coloca el navbar a la derecha */
+    height: 100vh;
+  }
+  
+  .navbar {
+    width: 200px;
+    background-color: #333;
+    color: white;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    padding-top: 20px;
+    position: fixed;
+    right: 0;
+    top: 0;
+    height: 100%;
+    z-index: 10;
+  }
+  
+  .navbar a {
+    color: white;
+    text-decoration: none;
+    padding: 10px;
+    width: 100%;
+    text-align: left;
+  }
+  
+  .navbar a:hover {
+    background-color: #575757;
+  }
+  
+  .content {
+    margin-right: 220px; /* Da espacio a la derecha para el navbar */
+    padding: 20px;
+    flex: 1;
+    overflow-y: auto;
+  }
+  

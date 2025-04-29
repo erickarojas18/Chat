@@ -20,14 +20,15 @@ const ListaUsuarios = () => {
         const payload = JSON.parse(atob(token.split('.')[1]));
         const companyId = payload.companyId;
 
-        const response = await axios.get(
-          `https://814ooupswb.execute-api.us-east-1.amazonaws.com/dev/users?companyId=${companyId}`,
-          {
-            headers: {
-              Authorization: `Bearer ${token}`
-            }
-          }
-        );
+        // Enviamos el companyId como parámetro en la URL
+        const response = await axios.get('https://814ooupswb.execute-api.us-east-1.amazonaws.com/dev/lista', {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+          params: {
+            companyId: companyId,  // Aquí pasamos el companyId como parámetro en la URL
+          },
+        });
 
         setUsuarios(response.data);
       } catch (err) {

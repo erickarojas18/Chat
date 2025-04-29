@@ -23,28 +23,42 @@ const verifyToken = (token) => {
   return new Promise((resolve, reject) => {
     jwt.verify(token, process.env.JWT_SECRET, (err, decoded) => {
       if (err) {
-        return reject('Invalid or expired token');
+        return reject(new Error('Invalid or expired token'));
       }
       resolve(decoded);
     });
   });
 };
 
+const CORS_HEADERS = {
+  'Access-Control-Allow-Origin': 'http://localhost:3001',
+  'Access-Control-Allow-Credentials': true,
+  'Access-Control-Allow-Methods': 'GET, OPTIONS',
+  'Access-Control-Allow-Headers': 'Content-Type, Authorization', // Permite estos headers en la solicitud
+};
+
 export const handler = async (event) => {
   console.log('Lambda started');
+
+  // Manejo de preflight OPTIONS
+  if (event.httpMethod === 'OPTIONS') {
+    return {
+      statusCode: 200,
+      headers: CORS_HEADERS,
+      body: '',
+    };
+  }
 
   try {
     await connectToDatabase();
 
-    const token = event.headers.Authorization && event.headers.Authorization.split(' ')[1];
+    const authHeader = event.headers.Authorization || event.headers.authorization;
+    const token = authHeader && authHeader.split(' ')[1];
 
     if (!token) {
       return {
         statusCode: 401,
-        headers: {
-          'Access-Control-Allow-Origin': 'http://localhost:3001',
-          'Access-Control-Allow-Credentials': true,
-        },
+        headers: CORS_HEADERS,
         body: JSON.stringify({ message: 'Authorization token is required' }),
       };
     }
@@ -53,15 +67,12 @@ export const handler = async (event) => {
     console.log('User authenticated:', decoded);
 
     if (event.httpMethod === 'GET') {
-      const companyId = event.queryStringParameters.companyId;
+      const companyId = event.queryStringParameters?.companyId;
 
       if (!companyId) {
         return {
           statusCode: 400,
-          headers: {
-            'Access-Control-Allow-Origin': 'http://localhost:3001',
-            'Access-Control-Allow-Credentials': true,
-          },
+          headers: CORS_HEADERS,
           body: JSON.stringify({ message: 'Company ID is required' }),
         };
       }
@@ -69,10 +80,7 @@ export const handler = async (event) => {
       if (decoded.companyId !== companyId) {
         return {
           statusCode: 403,
-          headers: {
-            'Access-Control-Allow-Origin': 'http://localhost:3001',
-            'Access-Control-Allow-Credentials': true,
-          },
+          headers: CORS_HEADERS,
           body: JSON.stringify({ message: 'User is not authorized to access this company\'s data' }),
         };
       }
@@ -81,20 +89,14 @@ export const handler = async (event) => {
 
       return {
         statusCode: 200,
-        headers: {
-          'Access-Control-Allow-Origin': 'http://localhost:3001',
-          'Access-Control-Allow-Credentials': true,
-        },
+        headers: CORS_HEADERS,
         body: JSON.stringify(users),
       };
     }
 
     return {
       statusCode: 404,
-      headers: {
-        'Access-Control-Allow-Origin': 'http://localhost:3001',
-        'Access-Control-Allow-Credentials': true,
-      },
+      headers: CORS_HEADERS,
       body: JSON.stringify({ message: 'Route not found' }),
     };
 
@@ -102,10 +104,7 @@ export const handler = async (event) => {
     console.error('Error occurred:', error);
     return {
       statusCode: 500,
-      headers: {
-        'Access-Control-Allow-Origin': 'http://localhost:3001',
-        'Access-Control-Allow-Credentials': true,
-      },
+      headers: CORS_HEADERS,
       body: JSON.stringify({ error: error.message }),
     };
   }
