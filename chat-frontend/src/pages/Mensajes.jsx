@@ -15,7 +15,8 @@ const Mensajes = () => {
     setError('');
 
     try {
-      const response = await axios.post('https://tu-api.execute-api.us-east-1.amazonaws.com/dev/message', {
+      const response = await axios.post('https://814ooupswb.execute-api.us-east-1.amazonaws.com/dev/message', {
+
         from,
         to,
         content,

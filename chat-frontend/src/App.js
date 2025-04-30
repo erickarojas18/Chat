@@ -5,7 +5,7 @@ import Dashboard from './pages/Dashboard';
 import Historial from './pages/Historial';
 import ListaUsuarios from './pages/ListaUsuarios';
 import Busqueda from './pages/Busqueda';
-import Mensajes from './pages/Mensajes'; // 👈 Importamos el componente de mensajes
+import Mensajes from './pages/Mensajes'; 
 
 function App() {
   return (
@@ -20,7 +20,7 @@ function App() {
         <Route path="/dashboard/historial" element={<Historial />} />
         <Route path="/dashboard/lista" element={<ListaUsuarios />} />
         <Route path="/dashboard/busqueda" element={<Busqueda />} />
-        <Route path="/dashboard/mensajes" element={<Mensajes />} /> {/* 👈 Nueva ruta */}
+        <Route path="/dashboard/mensajes/:userId" element={<Mensajes />} />
       </Routes>
     </Router>
   );
