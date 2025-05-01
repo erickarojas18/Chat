@@ -1,40 +1,80 @@
-.dashboard-container {
-    display: flex;
-    flex-direction: row-reverse; /* Coloca el navbar a la derecha */
-    height: 100vh;
-  }
-  
-  .navbar {
-    width: 200px;
-    background-color: #333;
-    color: white;
-    display: flex;
-    flex-direction: column;
-    align-items: flex-start;
-    padding-top: 20px;
-    position: fixed;
-    right: 0;
-    top: 0;
-    height: 100%;
-    z-index: 10;
-  }
-  
-  .navbar a {
-    color: white;
-    text-decoration: none;
-    padding: 10px;
-    width: 100%;
-    text-align: left;
-  }
-  
-  .navbar a:hover {
-    background-color: #575757;
-  }
-  
-  .content {
-    margin-right: 220px; /* Da espacio a la derecha para el navbar */
-    padding: 20px;
-    flex: 1;
-    overflow-y: auto;
-  }
-  
+/* ChatLayout.css — Estilo exclusivo del dashboard */
+
+.dashboard-page {
+  height: 100vh;
+  width: 100vw;
+  background: linear-gradient(to right, #4facfe, #00f2fe);
+  background-size: cover;
+  backdrop-filter: blur(4px);
+  display: flex;
+}
+
+.chat-layout {
+  display: flex;
+  flex: 1;
+  overflow: hidden;
+  font-family: 'Segoe UI', Arial, sans-serif;
+}
+
+/* Panel izquierdo: usuarios */
+.chat-layout .usuarios-panel {
+  width: 30%;
+  background: rgba(255, 255, 255, 0.85);
+  padding: 1rem;
+  overflow-y: auto;
+  border-right: 1px solid #e0e0e0;
+  backdrop-filter: blur(6px);
+}
+
+.chat-layout .usuarios-panel h2 {
+  font-size: 1.4rem;
+  margin-bottom: 1rem;
+  border-bottom: 1px solid #ccc;
+  padding-bottom: 0.5rem;
+  color: #333;
+}
+
+.chat-layout .usuario-item {
+  padding: 0.75rem;
+  margin-bottom: 0.5rem;
+  background: rgba(249, 249, 249, 0.9);
+  border-radius: 8px;
+  cursor: pointer;
+  transition: background 0.2s ease;
+  color: #333;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+}
+
+.chat-layout .usuario-item:hover {
+  background: rgba(255, 255, 255, 1);
+}
+
+/* Panel derecho: conversación */
+.chat-layout .chat-panel {
+  width: 70%;
+  background: rgba(255, 255, 255, 0.9);
+  padding: 1rem;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  color: #333;
+  backdrop-filter: blur(6px);
+}
+
+.chat-panel h3 {
+  font-size: 1.2rem;
+  margin-bottom: 1rem;
+  color: #4facfe;
+}
+
+.mensaje-bienvenida {
+  margin-top: 2rem;
+  font-size: 1.1rem;
+  color: #555;
+  text-align: center;
+}
+.usuarios-lista {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}

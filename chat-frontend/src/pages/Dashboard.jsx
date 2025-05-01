@@ -1,17 +1,14 @@
-import { Link, Outlet, useNavigate } from 'react-router-dom';
-import '../Css/Login.css'; 
 import { useEffect, useState } from 'react';
 import axios from 'axios';
+import '../Css/Dashboard.css';
+import Mensajes from './Mensajes'; // Asegúrate de tener este componente
 
 const Dashboard = () => {
   const [usuarios, setUsuarios] = useState([]);
   const [error, setError] = useState('');
-  const navigate = useNavigate(); // Hook para redirección
+  const [usuarioSeleccionado, setUsuarioSeleccionado] = useState(null);
 
   useEffect(() => {
-
-  const storedUserId = localStorage.getItem('userId');
-  console.log('UserId desde localStorage:', storedUserId);
     const fetchUsuarios = async () => {
       try {
         const token = localStorage.getItem('token');
@@ -23,14 +20,15 @@ const Dashboard = () => {
         const payload = JSON.parse(atob(token.split('.')[1]));
         const companyId = payload.companyId;
 
-        const response = await axios.get('https://814ooupswb.execute-api.us-east-1.amazonaws.com/dev/lista', {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-          params: {
-            companyId: companyId,
-          },
-        });
+        const response = await axios.get(
+          'https://814ooupswb.execute-api.us-east-1.amazonaws.com/dev/lista',
+          {
+            headers: {
+              Authorization: `Bearer ${token}`,
+            },
+            params: { companyId },
+          }
+        );
 
         setUsuarios(response.data);
       } catch (err) {
@@ -42,46 +40,42 @@ const Dashboard = () => {
     fetchUsuarios();
   }, []);
 
-  const handleUserClick = (userId) => {
-    // Redirige al chat de mensajes
-    navigate(`/dashboard/mensajes/${userId}`);
+  const handleUserClick = (user) => {
+    setUsuarioSeleccionado(user);
   };
 
   return (
-    <div className="dashboard-container">
-      <div className="content">
-        <h2>Lista de Usuarios</h2>
-        {error && <p style={{ color: 'red' }}>{error}</p>}
-        {usuarios.length > 0 ? (
-          <ul style={{ listStyle: 'none', padding: 0 }}>
-            {usuarios.map((user) => (
-              <li
-                key={user._id}
-                style={{
-                  background: 'rgba(255, 255, 255, 0.08)',
-                  padding: '0.75rem',
-                  borderRadius: '8px',
-                  marginBottom: '0.5rem',
-                  cursor: 'pointer'
-                }}
-                onClick={() => handleUserClick(user._id)} // Evento de clic
-              >
-                <strong>{user.name}</strong> — {user.email}
-              </li>
-            ))}
-          </ul>
-        ) : (
-          !error && <p>No se encontraron usuarios.</p>
-        )}
-        <Outlet />
+    <div className="dashboard-page">
+      <div className="chat-layout">
+        <aside className="usuarios-panel">
+          <h2>Usuarios</h2>
+          {error && <p style={{ color: 'red' }}>{error}</p>}
+          {usuarios.length > 0 ? (
+            <ul className="usuarios-lista">
+              {usuarios.map((user) => (
+                <li
+                  key={user._id}
+                  className="usuario-item"
+                  onClick={() => handleUserClick(user)}
+                >
+                  <strong>{user.name}</strong><br />
+                  <span>{user.email}</span>
+                </li>
+              ))}
+            </ul>
+          ) : (
+            !error && <p>No se encontraron usuarios.</p>
+          )}
+        </aside>
+  
+        <section className="chat-panel">
+          {usuarioSeleccionado ? (
+            <Mensajes usuario={usuarioSeleccionado} />
+          ) : (
+            <p className="mensaje-bienvenida">Selecciona un usuario para comenzar a chatear</p>
+          )}
+        </section>
       </div>
-      <nav className="navbar">
-        <Link to="/dashboard">Home</Link>
-        <Link to="/dashboard/historial">Historial</Link>
-        <Link to="/dashboard/lista">Lista de Usuarios</Link>
-        <Link to="/dashboard/busqueda">Búsqueda</Link>
-        <Link to="/dashboard/mensajes/:userId">Mensajes</Link>
-      </nav>
     </div>
   );
 };
