@@ -1,7 +1,6 @@
-// src/pages/ListaUsuarios.jsx
 import { useEffect, useState } from 'react';
 import axios from 'axios';
-import '../Css/Login.css'; // Reutilizando el mismo estilo
+import '../Css/Login.css';
 
 const ListaUsuarios = () => {
   const [usuarios, setUsuarios] = useState([]);
@@ -16,8 +15,9 @@ const ListaUsuarios = () => {
           return;
         }
 
-        // Decodificamos el token para obtener el companyId
+        // Decodificamos el token para obtener el userId
         const payload = JSON.parse(atob(token.split('.')[1]));
+        const userId = payload.userId;  // Obtenemos el userId del token
         const companyId = payload.companyId;
 
         // Enviamos el companyId como parámetro en la URL
@@ -26,11 +26,14 @@ const ListaUsuarios = () => {
             Authorization: `Bearer ${token}`,
           },
           params: {
-            companyId: companyId,  // Aquí pasamos el companyId como parámetro en la URL
+            companyId: companyId,
           },
         });
 
-        setUsuarios(response.data);
+        // Filtramos el usuario actual para que no se muestre en la lista
+        const filteredUsers = response.data.filter(user => user._id !== userId);
+
+        setUsuarios(filteredUsers);
       } catch (err) {
         console.error(err);
         setError('Error al obtener la lista de usuarios.');
@@ -53,7 +56,7 @@ const ListaUsuarios = () => {
                 background: 'rgba(255, 255, 255, 0.08)',
                 padding: '0.75rem',
                 borderRadius: '8px',
-                marginBottom: '0.5rem'
+                marginBottom: '0.5rem',
               }}
             >
               <strong>{user.name}</strong> — {user.email}

@@ -9,6 +9,9 @@ const Dashboard = () => {
   const navigate = useNavigate(); // Hook para redirección
 
   useEffect(() => {
+
+  const storedUserId = localStorage.getItem('userId');
+  console.log('UserId desde localStorage:', storedUserId);
     const fetchUsuarios = async () => {
       try {
         const token = localStorage.getItem('token');

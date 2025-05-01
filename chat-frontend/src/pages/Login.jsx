@@ -20,9 +20,12 @@ const Login = () => {
         password
       });
 
-      const { token } = response.data;
+      const { token, userId} = response.data;
       localStorage.setItem('token', token);
+      localStorage.setItem('userId', userId); 
       alert('Login exitoso');
+      console.log('Login exitoso - userId:', userId);
+
       
       // Redirige al Dashboard después del login exitoso
       navigate('/dashboard');
