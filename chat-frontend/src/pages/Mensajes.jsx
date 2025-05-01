@@ -11,10 +11,9 @@ const Mensajes = ({ usuario }) => {
   const from = localStorage.getItem('userId');
   const to = usuario._id;
 
-  // Ref para el contenedor de mensajes para hacer scroll automáticamente
   const chatBodyRef = useRef(null);
 
-  // Función para cargar los mensajes entre los dos usuarios
+  // Cargar mensajes desde la API
   const cargarMensajes = async () => {
     try {
       const response = await axios.get(
@@ -24,9 +23,8 @@ const Mensajes = ({ usuario }) => {
         }
       );
       if (response.status === 200) {
-        // Ordenar los mensajes por fecha de creación (de más antiguos a más recientes)
         const mensajesOrdenados = response.data.messages.sort(
-          (a, b) => new Date(a.createdAt) - new Date(b.createdAt)
+          (a, b) => new Date(a.timestamp) - new Date(b.timestamp)
         );
         setMensajes(mensajesOrdenados);
       }
@@ -35,17 +33,14 @@ const Mensajes = ({ usuario }) => {
     }
   };
 
-  // Cargar mensajes al iniciar el componente o cuando cambie el usuario
   useEffect(() => {
     if (from && to) {
       cargarMensajes();
     }
   }, [to]);
 
-  // Scroll automático hacia el último mensaje cuando los mensajes cambian
   useEffect(() => {
     if (chatBodyRef.current) {
-      // Hacemos scroll hacia el final cada vez que cambien los mensajes
       chatBodyRef.current.scrollTop = chatBodyRef.current.scrollHeight;
     }
   }, [mensajes]);
@@ -64,11 +59,19 @@ const Mensajes = ({ usuario }) => {
       if (response.status === 200) {
         setRespuesta('Mensaje enviado');
         setContent('');
-        await cargarMensajes(); // Recargar mensajes después de enviar uno nuevo
+        await cargarMensajes();
       }
     } catch (err) {
       setError('Error al enviar mensaje: ' + (err.response?.data?.message || err.message));
     }
+  };
+
+  // Formatear hora desde timestamp
+  const formatHora = (timestamp) => {
+    const date = new Date(timestamp);
+    const hours = date.getHours().toString().padStart(2, '0');
+    const minutes = date.getMinutes().toString().padStart(2, '0');
+    return `${hours}:${minutes}`;
   };
 
   return (
@@ -79,14 +82,13 @@ const Mensajes = ({ usuario }) => {
 
       <div className="chat-body" ref={chatBodyRef}>
         {mensajes.length > 0 ? (
-          // Invertir el orden de los mensajes para que el más reciente aparezca al final
           [...mensajes].reverse().map((msg, index) => (
             <div
               key={index}
               className={`mensaje ${msg.from === from ? 'mensaje-propio' : 'mensaje-ajeno'}`}
             >
               <p>{msg.content}</p>
-              <span className="hora">{new Date(msg.createdAt).toLocaleTimeString()}</span>
+              <span className="hora-mensaje">{formatHora(msg.timestamp)}</span>
             </div>
           ))
         ) : (
