@@ -1,16 +1,14 @@
 import mongoose from 'mongoose';
-import Busqueda from './models/busquedaModel.mjs';
+import Message from './models/messageModel.mjs';
 
+// Conexión reutilizable
 let isConnected = false;
-
 const connectDB = async () => {
   if (isConnected) return;
-
   await mongoose.connect(process.env.MONGO_URI, {
     useNewUrlParser: true,
     useUnifiedTopology: true,
   });
-
   isConnected = true;
 };
 
@@ -30,25 +28,13 @@ export const handler = async (event) => {
     };
   }
 
-  const filters = {
-    from: { $regex: new RegExp(`^${from}$`, 'i') },
-    to: { $regex: new RegExp(`^${to}$`, 'i') },
-  };
-
   try {
-    console.log('Filtro que voy a buscar:', JSON.stringify(filters));
-    const messages = await Busqueda.find(filters).sort({ createdAt: 1 });
-
-    if (messages.length === 0) {
-      return {
-        statusCode: 404,
-        headers: {
-          'Access-Control-Allow-Origin': 'http://localhost:3001',
-          'Access-Control-Allow-Credentials': true,
-        },
-        body: JSON.stringify({ message: "No se encontraron mensajes." }),
-      };
-    }
+    const messages = await Message.find({
+      $or: [
+        { from: { $regex: new RegExp(from, 'i') }, to: { $regex: new RegExp(to, 'i') } },
+        { from: { $regex: new RegExp(to, 'i') }, to: { $regex: new RegExp(from, 'i') } },
+      ]
+    }).sort({ timestamp: 1 });
 
     return {
       statusCode: 200,
@@ -56,7 +42,11 @@ export const handler = async (event) => {
         'Access-Control-Allow-Origin': 'http://localhost:3001',
         'Access-Control-Allow-Credentials': true,
       },
-      body: JSON.stringify(messages),
+      body: JSON.stringify({
+        success: true,
+        count: messages.length,
+        messages,
+      }),
     };
   } catch (error) {
     return {
@@ -65,7 +55,7 @@ export const handler = async (event) => {
         'Access-Control-Allow-Origin': 'http://localhost:3001',
         'Access-Control-Allow-Credentials': true,
       },
-      body: JSON.stringify({ message: error.message }),
+      body: JSON.stringify({ message: 'Error interno', error: error.message }),
     };
   }
 };

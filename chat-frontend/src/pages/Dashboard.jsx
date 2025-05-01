@@ -77,7 +77,7 @@ const Dashboard = () => {
         <Link to="/dashboard/historial">Historial</Link>
         <Link to="/dashboard/lista">Lista de Usuarios</Link>
         <Link to="/dashboard/busqueda">Búsqueda</Link>
-        <Link to="/dashboard/mensajes">Mensajes</Link>
+        <Link to="/dashboard/mensajes/:userId">Mensajes</Link>
       </nav>
     </div>
   );

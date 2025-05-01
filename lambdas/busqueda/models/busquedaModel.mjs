@@ -1,6 +1,6 @@
 import mongoose from 'mongoose';
 
-const busquedaSchema = new mongoose.Schema(
+const messageSchema = new mongoose.Schema(
   {
     from: {
       type: String,
@@ -13,14 +13,17 @@ const busquedaSchema = new mongoose.Schema(
     content: {
       type: String,
       required: true,
+    },
+    timestamp: {
+      type: Date,
+      default: Date.now,
     }
-    // NO pongas createdAt manualmente
   },
   {
-    timestamps: true, // Esto agrega automáticamente createdAt y updatedAt
+    timestamps: true,
   }
 );
 
-const Busqueda = mongoose.model('Busqueda', busquedaSchema);
+const Message = mongoose.models.Message || mongoose.model('Message', messageSchema);
 
-export default Busqueda;
+export default Message;
