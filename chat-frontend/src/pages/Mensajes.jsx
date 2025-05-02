@@ -1,5 +1,7 @@
 import { useState, useEffect, useRef } from 'react';
 import axios from 'axios';
+import EmojiPicker from 'emoji-picker-react';
+import { FaSmile } from 'react-icons/fa';
 import '../Css/Mensajes.css';
 
 const Mensajes = ({ usuario }) => {
@@ -7,20 +9,37 @@ const Mensajes = ({ usuario }) => {
   const [mensajes, setMensajes] = useState([]);
   const [respuesta, setRespuesta] = useState('');
   const [error, setError] = useState('');
+  const [mostrarPicker, setMostrarPicker] = useState(false);
 
   const from = localStorage.getItem('userId');
   const to = usuario._id;
 
   const chatBodyRef = useRef(null);
+  const pickerRef = useRef(null);
+
+  // Cerrar picker si se hace clic fuera
+  useEffect(() => {
+    const manejarClickFuera = (event) => {
+      if (pickerRef.current && !pickerRef.current.contains(event.target)) {
+        setMostrarPicker(false);
+      }
+    };
+
+    if (mostrarPicker) {
+      document.addEventListener('mousedown', manejarClickFuera);
+    }
+
+    return () => {
+      document.removeEventListener('mousedown', manejarClickFuera);
+    };
+  }, [mostrarPicker]);
 
   // Cargar mensajes desde la API
   const cargarMensajes = async () => {
     try {
       const response = await axios.get(
         'https://814ooupswb.execute-api.us-east-1.amazonaws.com/dev/messages',
-        {
-          params: { from, to },
-        }
+        { params: { from, to } }
       );
       if (response.status === 200) {
         const mensajesOrdenados = response.data.messages.sort(
@@ -30,6 +49,7 @@ const Mensajes = ({ usuario }) => {
       }
     } catch (err) {
       setError('Error al cargar mensajes: ' + (err.response?.data?.message || err.message));
+      setTimeout(() => setError(''), 3000);
     }
   };
 
@@ -50,6 +70,12 @@ const Mensajes = ({ usuario }) => {
     setRespuesta('');
     setError('');
 
+    if (!content.trim()) {
+      setError('No puedes enviar un mensaje vacío');
+      setTimeout(() => setError(''), 3000);
+      return;
+    }
+
     try {
       const response = await axios.post(
         'https://814ooupswb.execute-api.us-east-1.amazonaws.com/dev/messages',
@@ -60,18 +86,23 @@ const Mensajes = ({ usuario }) => {
         setRespuesta('Mensaje enviado');
         setContent('');
         await cargarMensajes();
+        setTimeout(() => setRespuesta(''), 3000);
       }
     } catch (err) {
       setError('Error al enviar mensaje: ' + (err.response?.data?.message || err.message));
+      setTimeout(() => setError(''), 3000);
     }
   };
 
-  // Formatear hora desde timestamp
   const formatHora = (timestamp) => {
     const date = new Date(timestamp);
     const hours = date.getHours().toString().padStart(2, '0');
     const minutes = date.getMinutes().toString().padStart(2, '0');
     return `${hours}:${minutes}`;
+  };
+
+  const agregarEmoji = (emojiData) => {
+    setContent((prev) => prev + emojiData.emoji);
   };
 
   return (
@@ -97,12 +128,25 @@ const Mensajes = ({ usuario }) => {
       </div>
 
       <form className="chat-input-area" onSubmit={enviarMensaje}>
-        <textarea
-          placeholder="Escribe tu mensaje..."
-          value={content}
-          onChange={(e) => setContent(e.target.value)}
-          required
-        />
+        <div className="input-con-emojis">
+          <textarea
+            placeholder="Escribe tu mensaje..."
+            value={content}
+            onChange={(e) => setContent(e.target.value)}
+          />
+          <button
+            type="button"
+            onClick={() => setMostrarPicker(!mostrarPicker)}
+            className="emoji-button"
+          >
+            <FaSmile />
+          </button>
+          {mostrarPicker && (
+            <div className="emoji-picker" ref={pickerRef}>
+              <EmojiPicker onEmojiClick={agregarEmoji} />
+            </div>
+          )}
+        </div>
         <button type="submit">Enviar</button>
       </form>
 

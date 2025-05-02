@@ -1,12 +1,16 @@
 import { useEffect, useState } from 'react';
 import axios from 'axios';
 import '../Css/Dashboard.css';
-import Mensajes from './Mensajes'; // Asegúrate de tener este componente
+import Mensajes from './Mensajes'; 
+import Historial from './Historial';
 
 const Dashboard = () => {
   const [usuarios, setUsuarios] = useState([]);
   const [error, setError] = useState('');
   const [usuarioSeleccionado, setUsuarioSeleccionado] = useState(null);
+  const [mostrarHistorial, setMostrarHistorial] = useState(false); 
+
+  const userId = localStorage.getItem('userId'); // Recuperamos el userId desde el localStorage
 
   useEffect(() => {
     const fetchUsuarios = async () => {
@@ -42,6 +46,11 @@ const Dashboard = () => {
 
   const handleUserClick = (user) => {
     setUsuarioSeleccionado(user);
+    setMostrarHistorial(false); // Ocultamos el historial al seleccionar un nuevo usuario
+  };
+
+  const handleHistorialClick = () => {
+    setMostrarHistorial(true); // Mostramos el historial
   };
 
   return (
@@ -49,6 +58,9 @@ const Dashboard = () => {
       <div className="chat-layout">
         <aside className="usuarios-panel">
           <h2>Usuarios</h2>
+          <button className="historial-btn" onClick={handleHistorialClick}>
+            Historial
+          </button>
           {error && <p style={{ color: 'red' }}>{error}</p>}
           {usuarios.length > 0 ? (
             <ul className="usuarios-lista">
@@ -67,12 +79,12 @@ const Dashboard = () => {
             !error && <p>No se encontraron usuarios.</p>
           )}
         </aside>
-  
+
         <section className="chat-panel">
-          {usuarioSeleccionado ? (
-            <Mensajes usuario={usuarioSeleccionado} />
+          {mostrarHistorial ? (
+            <Historial userId={userId} />
           ) : (
-            <p className="mensaje-bienvenida">Selecciona un usuario para comenzar a chatear</p>
+            usuarioSeleccionado && <Mensajes usuario={usuarioSeleccionado} />
           )}
         </section>
       </div>

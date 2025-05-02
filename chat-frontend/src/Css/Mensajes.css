@@ -42,21 +42,9 @@
     gap: 0.5rem;
   }
   
-  .chat-input-area textarea {
-    min-height: 100px;
-    resize: vertical;
-    padding: 0.75rem;
-    font-size: 0.95rem;
-    border: 1px solid #ddd;
-    border-radius: 8px;
-    width: 100%;
-    font-family: 'Inter', sans-serif;
-    background-color: #fafafa;
-  }
-  
   .chat-input-area button {
     align-self: flex-end;
-    background-color: #1e88e5;
+    background-color: #993da5; /* Morado */
     color: white;
     border: none;
     padding: 0.3rem 0.8rem;
@@ -67,9 +55,40 @@
     transition: background-color 0.2s ease;
   }
   
+  /* Para el hover */
   .chat-input-area button:hover {
-    background-color: #1565c0;
+    background-color: #7b2e8c; /* Morado más oscuro */
   }
+  
+  .chat-input-area button {
+    align-self: flex-end;
+    background-color: #a53d97;
+    color: white;
+    border: none;
+    padding: 0.3rem 0.8rem;
+    border-radius: 6px;
+    cursor: pointer;
+    font-size: 0.8rem;
+    font-weight: 500;
+    transition: background-color 0.2s ease;
+  }
+  
+  .chat-input-area textarea {
+    min-height: 60px; /* antes era 100px */
+    resize: vertical;
+    padding: 0.5rem;
+    font-size: 0.9rem;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    width: 100%;
+    font-family: 'Inter', sans-serif;
+    background-color: #fafafa;
+  }
+  .chat-input-area textarea:focus {
+    outline: none; /* Elimina el borde negro por defecto */
+    border: 1px solid #ddd; /* Puedes usar el mismo borde gris o cualquier otro color que prefieras */
+  }
+  
   
   .respuesta {
     margin-top: 0.5rem;
@@ -92,16 +111,19 @@
   }
   
   .mensaje-propio {
-    background-color: #dcf8c6;
-    align-self: flex-end; /* Los mensajes propios estarán a la derecha */
+    background: linear-gradient(to right, #4facfe, #00f2fe);
+    color: white;
+    align-self: flex-end;
     text-align: right;
   }
   
   .mensaje-ajeno {
-    background-color: #f1f0f0;
-    align-self: flex-start; /* Los mensajes ajenos estarán a la izquierda */
+    background-color: #d6b3ff; /* morado más claro */
+    color: black;
+    align-self: flex-start;
     text-align: left;
   }
+  
   
   .chat-body {
     display: flex;
@@ -117,7 +139,7 @@
   }
   
   .mensaje-propio {
-    background-color: #d1f7c4;
+    background-color: #d619cd;
     align-self: flex-end;
   }
   
@@ -132,5 +154,53 @@
     display: block;
     margin-top: 5px;
     text-align: right;
+  }
+  .input-con-emojis {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+  }
+  
+  .emoji-button {
+    background-color: #f0f0f0;
+    border: 1px solid #ccc;
+    border-radius: 6px;
+    font-size: 20px;
+    padding: 6px;
+    cursor: pointer;
+    color: #333;
+    transition: background 0.2s;
+  }
+  
+  .emoji-button:hover {
+    background-color: #e0e0e0;
+  }
+  
+  .emoji-picker {
+    position: absolute;
+    bottom: 60px;
+    right: 10px;
+    z-index: 1000;
+  }
+  .input-con-emojis {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+  }
+  
+  .emoji-button {
+    background: none;
+    border: none;
+    font-size: 24px;
+    cursor: pointer;
+    align-self: flex-end;
+    margin-top: 5px;
+  }
+  
+  .emoji-picker {
+    position: absolute;
+    bottom: 60px;
+    right: 10px;
+    z-index: 1000;
   }
   

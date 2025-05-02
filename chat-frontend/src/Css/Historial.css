@@ -1,0 +1,96 @@
+.historial-container {
+    padding: 20px;
+    font-family: 'Segoe UI', sans-serif;
+  }
+  
+  .historial-title {
+    font-size: 1.6rem;
+    margin-bottom: 15px;
+    color: #000000;
+  }
+  
+  .chat-history {
+    max-height: 500px;
+    overflow-y: auto;
+    display: flex;
+    flex-direction: column;
+    gap: 18px;
+    padding-right: 10px;
+  }
+  
+  
+  .message-bubble {
+    background-color: #ffffff;
+    border-left: 5px solid  #08ffca;
+   
+    padding: 12px 18px;
+    border-radius: 20px;
+    box-shadow: 0 3px 6px rgba(0, 0, 0, 0.08);
+    max-width: 80%;         /* Ocupa más ancho */
+    min-width: 250px;        /* Asegura buena base visual */
+    align-self: flex-end;
+    animation: fadeIn 0.3s ease-in;
+    word-break: break-word;
+    line-height: 1.6;
+    font-size: 15px;
+  }
+  
+  
+  .message-header {
+    font-weight: bold;
+    margin-bottom: 5px;
+    color: #007c91;
+  }
+  
+  .from-label {
+    color: #007c91;
+  }
+  
+  .arrow {
+    margin: 0 4px;
+  }
+  
+  .to-label {
+    color: #004d40;
+  }
+  
+  .email-label {
+    font-weight: normal;
+    color: #555;
+    margin-left: 5px;
+    font-size: 0.9em;
+  }
+  
+  .message-content {
+    font-size: 1rem;
+    color: #333;
+    margin-bottom: 6px;
+    white-space: pre-wrap;
+  }
+  
+  .message-timestamp {
+    font-size: 0.75rem;
+    color: #777;
+    text-align: right;
+  }
+  
+  .historial-loading,
+  .historial-empty {
+    padding: 20px;
+    color: #555;
+    font-style: italic;
+    text-align: center;
+  }
+  
+  @keyframes fadeIn {
+    from {
+      opacity: 0;
+      transform: translateY(10px);
+    }
+  
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+  

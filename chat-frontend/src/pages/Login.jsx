@@ -1,18 +1,20 @@
 import { useState } from 'react';
 import axios from 'axios';
-import { useNavigate } from 'react-router-dom'; // Importa useNavigate
+import { useNavigate } from 'react-router-dom';
 import '../Css/Login.css';
 
 const Login = () => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
+  const [successMessage, setSuccessMessage] = useState('');
   
-  const navigate = useNavigate(); // Inicializa el hook de navegación
+  const navigate = useNavigate();
 
   const handleLogin = async (e) => {
     e.preventDefault();
     setError('');
+    setSuccessMessage(''); // Resetea el mensaje de éxito al intentar un login
 
     try {
       const response = await axios.post('https://814ooupswb.execute-api.us-east-1.amazonaws.com/dev/login', {
@@ -23,12 +25,15 @@ const Login = () => {
       const { token, userId} = response.data;
       localStorage.setItem('token', token);
       localStorage.setItem('userId', userId); 
-      alert('Login exitoso');
+      setSuccessMessage('Login exitoso');
       console.log('Login exitoso - userId:', userId);
 
-      
-      // Redirige al Dashboard después del login exitoso
-      navigate('/dashboard');
+      // Mostrar el mensaje de éxito durante 3 segundos y luego redirigir
+      setTimeout(() => {
+        setSuccessMessage('');
+        navigate('/dashboard');
+      }, 3000);
+
     } catch (err) {
       setError(err.response?.data?.message || 'Error de login');
     }
@@ -58,7 +63,14 @@ const Login = () => {
         </div>
         <button type="submit">Entrar</button>
       </form>
+      
       {error && <p style={{ color: 'red' }}>{error}</p>}
+
+      {successMessage && (
+        <div className="success-message">
+          {successMessage}
+        </div>
+      )}
 
       <div style={{ marginTop: '1rem', textAlign: 'center' }}>
         <button

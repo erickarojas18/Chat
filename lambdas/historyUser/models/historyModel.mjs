@@ -33,4 +33,7 @@ messageSchema.index({
   timestamp: -1 
 });
 
-export default mongoose.model('Message', messageSchema);
+
+const Message = mongoose.models.Message || mongoose.model('Message', messageSchema);
+
+export default Message;
